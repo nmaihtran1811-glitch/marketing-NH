@@ -1,5 +1,6 @@
 from datetime import datetime
 from io import BytesIO
+import os
 import sqlite3
 import pandas as pd
 import streamlit as st
@@ -14,6 +15,9 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
+
+# Tên file ảnh logo đuôi JPG trong thư mục dự án
+LOGO_FILE_PATH = "acb_logo.jpg"
 
 # Custom CSS: ACB Branding - Dark Blue & Gold Accents
 st.markdown(
@@ -86,9 +90,9 @@ st.markdown(
         box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         margin-bottom: 12px;
     }
-    .lead-priority-p1 { border-left-color: #ef4444; background: #fff5f5; } /* Đỏ - Ưu tiên cao nhất */
-    .lead-priority-p2 { border-left-color: #f59e0b; background: #fffbeb; } /* Vàng - Ưu tiên trung bình */
-    .lead-priority-p3 { border-left-color: #10b981; background: #f0fdf4; } /* Xanh - Chuẩn */
+    .lead-priority-p1 { border-left-color: #ef4444; background: #fff5f5; }
+    .lead-priority-p2 { border-left-color: #f59e0b; background: #fffbeb; }
+    .lead-priority-p3 { border-left-color: #10b981; background: #f0fdf4; }
 
     .tag-tier {
         display: inline-block;
@@ -108,7 +112,7 @@ st.markdown(
 
 
 # =========================================================
-# 2. KHỞI TẠO CƠ SỞ DỮ LIỆU SQLITE (DATABASE ACB MANAGEMENT)
+# 2. KHỞI TẠO CƠ SỞ DỮ LIỆU SQLITE
 # =========================================================
 
 DB_FILE = "acb_sales_db.sqlite"
@@ -151,17 +155,13 @@ setup_database()
 
 
 # =========================================================
-# 3. THUẬT TOÁN ĐÁNH GIÁ VÀ GỢI Ý (ACB SMART SCORING ENGINE)
+# 3. THUẬT TOÁN ĐÁNH GIÁ VÀ GỢI Ý SẢN PHẨM
 # =========================================================
 
 
 def evaluate_acb_lead(segment, income, cis_score, demand, amount, urgency):
-    """Mô hình tính điểm tiềm năng kinh doanh riêng cho ACB dựa trên phân hạng khách hàng,"
-    điểm CIC/CIS và loại hình nhu cầu tài chính.
-    """
     score = 0
 
-    # 1. Phân hạng khách hàng (Customer Segment)
     if segment == "Khách hàng Ưu tiên (ACB Privilege)":
         score += 35
     elif segment == "Khách hàng Doanh nghiệp SME":
@@ -171,7 +171,6 @@ def evaluate_acb_lead(segment, income, cis_score, demand, amount, urgency):
     else:
         score += 15
 
-    # 2. Thu nhập hàng tháng (Triệu VNĐ)
     if income >= 80:
         score += 25
     elif income >= 40:
@@ -181,7 +180,6 @@ def evaluate_acb_lead(segment, income, cis_score, demand, amount, urgency):
     else:
         score += 10
 
-    # 3. Điểm tín dụng dự kiến (CIS Score 300 - 850)
     if cis_score >= 700:
         score += 20
     elif cis_score >= 600:
@@ -189,7 +187,6 @@ def evaluate_acb_lead(segment, income, cis_score, demand, amount, urgency):
     else:
         score += 5
 
-    # 4. Mức độ cấp thiết
     if urgency == "Gấp (Trong 7 ngày)":
         score += 20
     elif urgency == "Trong tháng này":
@@ -199,7 +196,6 @@ def evaluate_acb_lead(segment, income, cis_score, demand, amount, urgency):
 
     score = min(score, 100)
 
-    # Phân cấp xử lý kinh doanh (Priority Tier)
     if score >= 80:
         tier = "P1 - CẤP THIẾT"
     elif score >= 55:
@@ -211,7 +207,6 @@ def evaluate_acb_lead(segment, income, cis_score, demand, amount, urgency):
 
 
 def recommend_acb_products(demand, income, amount):
-"""Động cơ gợi ý sản phẩm phù hợp của Ngân hàng ACB."""
     recs = []
     if demand == "Vay thế chấp mua BĐS":
         recs.append("🏠 Gói vay mua nhà ACB - Lãi suất ưu đãi từ 6.5%/năm")
@@ -220,7 +215,7 @@ def recommend_acb_products(demand, income, amount):
     elif demand == "Vay tín chấp tiêu dùng":
         if income >= 20:
             recs.append("💳 Vay tín chấp theo lương ACB - Cấp vốn nhanh 48h")
-        recs.append("💳 Thẻ tín dụng ACB Visa Signature / JCB Ultimate")
+recs.append("💳 Thẻ tín dụng ACB Visa Signature / JCB Ultimate")
     elif demand == "Gửi tiết kiệm & Đầu tư":
         if amount >= 500:
             recs.append("💎 Tiết kiệm ACB Măng Non / Tích Lũy Tương Lai")
@@ -240,7 +235,7 @@ def format_currency_vnd(val):
 
 
 # =========================================================
-# 4. HÀM TƯƠNG TÁC CƠ SỞ DỮ LIỆU
+# 4. HÀM TƯƠNG TÁC DATABASE
 # =========================================================
 
 
@@ -287,17 +282,30 @@ def remove_lead(lead_id):
 
 
 # =========================================================
-# 5. THANH ĐIỀU HƯỚNG SIDEBAR
+# 5. THANH ĐIỀU HƯỚNG SIDEBAR (NHẬN FILE LOGO acb_logo.jpg)
 # =========================================================
 
 with st.sidebar:
+    # Kiểm tra xem file acb_logo.jpg có tồn tại trong folder không
+    if os.path.exists(LOGO_FILE_PATH):
+        st.image(LOGO_FILE_PATH, use_container_width=True)
+    else:
+        # Nếu chưa có file ảnh thì hiển thị tiêu đề chữ dự phòng
+        st.markdown(
+            """
+            <div style="text-align: center; padding: 10px 0;">
+                <h1 style="color: #ffffff; font-size: 26px; margin: 0; font-weight: 800;">ACB BANK</h1>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
     st.markdown(
         """
-        <div style="text-align: center; padding: 10px 0;">
-            <h1 style="color: #ffffff; font-size: 24px; margin: 0; font-weight: 800;">ACB BANK</h1>
-            <p style="color: #00a8e8; font-size: 12px; margin-top: 2px;">Smart Sales & Lead Portal</p>
-        </div>
-""",
+        <div style="text-align: center; margin-top: 5px; margin-bottom: 10px;">
+            <p style="color: #00a8e8; font-size: 13px; font-weight: 600; margin: 0;">Smart Sales & Lead Portal</p>
+</div>
+        """,
         unsafe_allow_html=True,
     )
     st.divider()
@@ -395,7 +403,7 @@ st.success("Không có khách hàng tồn đọng ở nhóm P1!")
                 st.markdown(
                     f"""
                     <div class="lead-box lead-priority-p1">
-                        <div style="display:flex; justify-shadow:space-between; align-items:center;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
                             <span style="font-size:18px; font-weight:700; color:#0d2c54;">👤 {r['full_name']}</span>
                             <span class="tag-tier tier-p1">{r['priority_tier']}</span>
                         </div>
@@ -527,7 +535,6 @@ elif nav_choice == "📂 Quản lý danh sách KH":
     if df_data.empty:
 st.warning("Hiện tại chưa có dữ liệu trong hệ thống database.")
     else:
-        # Bộ lọc nhanh
         f_col1, f_col2, f_col3 = st.columns(3)
         with f_col1:
             search_kw = st.text_input("🔍 Tìm tên hoặc SĐT")
@@ -569,7 +576,6 @@ st.warning("Hiện tại chưa có dữ liệu trong hệ thống database.")
                 df_filtered["sales_stage"] == filter_stage
             ]
 
-        # Hiển thị bảng
         view_df = df_filtered[
             [
                 "lead_code",
@@ -613,8 +619,8 @@ st.warning("Hiện tại chưa có dữ liệu trong hệ thống database.")
             col_detail1, col_detail2 = st.columns([2, 1])
 
             with col_detail1:
-st.write(f"**Mã hồ sơ:** {curr_row['lead_code']}")
-                st.write(
+                st.write(f"**Mã hồ sơ:** {curr_row['lead_code']}")
+st.write(
                     f"**Thu nhập khai báo:** {format_currency_vnd(curr_row['monthly_income'])} / tháng"
                 )
                 st.write(
@@ -623,7 +629,6 @@ st.write(f"**Mã hồ sơ:** {curr_row['lead_code']}")
                 st.write(f"**Chuyên viên phụ trách:** {curr_row['assigned_officer']}")
                 st.write(f"**Ghi chú tư vấn:** {curr_row['notes']}")
 
-                # Hiển thị Gợi ý Sản phẩm Ngân hàng ACB
                 recs = recommend_acb_products(
                     curr_row["main_demand"],
                     curr_row["monthly_income"],
@@ -681,9 +686,9 @@ elif nav_choice == "🔀 Tiến trình xử lý (Kanban)":
             with col:
                 st.markdown(
                     f"""
-<div style="background:#e2e8f0; padding:8px; border-radius:6px; text-align:center; font-weight:700; color:#0d2c54; font-size:13px;">
+                    <div style="background:#e2e8f0; padding:8px; border-radius:6px; text-align:center; font-weight:700; color:#0d2c54; font-size:13px;">
                         {stg}<br><span style="font-size:18px; color:#1e50a2;">({len(sub_df)})</span>
-                    </div>
+</div>
                     """,
                     unsafe_allow_html=True,
                 )
@@ -744,11 +749,11 @@ elif nav_choice == "🧮 Công cụ tính nhanh Khoản vay":
                     f"(Gốc: {int(monthly_principal):,} VNĐ + Lãi: {int(first_month_interest):,} VNĐ)"
                 )
                 st.info(
-f"📉 Các tháng tiếp theo tiền lãi sẽ giảm dần theo dư nợ thực tế."
+                    "📉 Các tháng tiếp theo tiền lãi sẽ giảm dần theo dư nợ thực tế."
                 )
             else:
                 monthly_interest = principal_val * monthly_rate
-                monthly_principal = principal_val / loan_tenure_months
+monthly_principal = principal_val / loan_tenure_months
                 fixed_pay = monthly_principal + monthly_interest
                 st.success(
                     f"👉 **Số tiền cố định trả hàng tháng:** ~ **{int(fixed_pay):,} VNĐ**"
@@ -796,7 +801,6 @@ elif nav_choice == "📊 Báo cáo tăng trưởng":
 
         st.divider()
 
-        # Tính toán tổng quy mô giá trị nhu cầu
         sum_value = 0.0
         for val in df_data["target_amount"]:
             if pd.notna(val) and val is not None:
@@ -822,6 +826,6 @@ if not df_data.empty:
         label="📥 Xuất Báo cáo Excel ACB",
         data=buffer.getvalue(),
         file_name="ACB_Smart_Leads_Report.xlsx",
-mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         use_container_width=True,
-    )    
+    )
