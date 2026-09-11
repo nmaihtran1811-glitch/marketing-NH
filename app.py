@@ -103,7 +103,7 @@ st.markdown(
         text-transform: uppercase;
     }
     .tier-p1 { background: #fee2e2; color: #991b1b; }
-.tier-p2 { background: #fef3c7; color: #92400e; }
+    .tier-p2 { background: #fef3c7; color: #92400e; }
     .tier-p3 { background: #d1fae5; color: #065f46; }
 </style>
 """,
@@ -215,7 +215,7 @@ def recommend_acb_products(demand, income, amount):
     elif demand == "Vay tín chấp tiêu dùng":
         if income >= 20:
             recs.append("💳 Vay tín chấp theo lương ACB - Cấp vốn nhanh 48h")
-recs.append("💳 Thẻ tín dụng ACB Visa Signature / JCB Ultimate")
+        recs.append("💳 Thẻ tín dụng ACB Visa Signature / JCB Ultimate")
     elif demand == "Gửi tiết kiệm & Đầu tư":
         if amount >= 500:
             recs.append("💎 Tiết kiệm ACB Măng Non / Tích Lũy Tương Lai")
@@ -282,15 +282,17 @@ def remove_lead(lead_id):
 
 
 # =========================================================
-# 5. THANH ĐIỀU HƯỚNG SIDEBAR (NHẬN FILE LOGO acb_logo.jpg)
+# 5. THANH ĐIỀU HƯỚNG SIDEBAR
 # =========================================================
 
 with st.sidebar:
-    # Kiểm tra xem file acb_logo.jpg có tồn tại trong folder không
     if os.path.exists(LOGO_FILE_PATH):
-        st.image(LOGO_FILE_PATH, use_container_width=True)
+        # Đã cập nhật tương thích các bản Streamlit
+        try:
+            st.image(LOGO_FILE_PATH, use_container_width=True)
+        except TypeError:
+            st.image(LOGO_FILE_PATH, use_column_width=True)
     else:
-        # Nếu chưa có file ảnh thì hiển thị tiêu đề chữ dự phòng
         st.markdown(
             """
             <div style="text-align: center; padding: 10px 0;">
@@ -304,7 +306,7 @@ with st.sidebar:
         """
         <div style="text-align: center; margin-top: 5px; margin-bottom: 10px;">
             <p style="color: #00a8e8; font-size: 13px; font-weight: 600; margin: 0;">Smart Sales & Lead Portal</p>
-</div>
+        </div>
         """,
         unsafe_allow_html=True,
     )
@@ -393,7 +395,7 @@ if nav_choice == "⚡ Bảng điều khiển Sales":
     else:
         top_p1 = df_data[df_data["priority_tier"] == "P1 - CẤP THIẾT"].head(4)
         if top_p1.empty:
-st.success("Không có khách hàng tồn đọng ở nhóm P1!")
+            st.success("Không có khách hàng tồn đọng ở nhóm P1!")
         else:
             for _, r in top_p1.iterrows():
                 recs = recommend_acb_products(
@@ -456,7 +458,7 @@ elif nav_choice == "📥 Tiếp nhận Lead mới":
                 "Nhu cầu tài chính chính",
                 [
                     "Vay thế chấp mua BĐS",
-"Vay sản xuất kinh doanh",
+                    "Vay sản xuất kinh doanh",
                     "Vay tín chấp tiêu dùng",
                     "Gửi tiết kiệm & Đầu tư",
                     "Mở thẻ tín dụng cao cấp",
@@ -483,9 +485,7 @@ elif nav_choice == "📥 Tiếp nhận Lead mới":
 
         notes = st.text_area("Ghi chú đặc điểm khách hàng / Lịch hẹn cuộc gọi")
 
-        btn_submit = st.form_submit_button(
-            "💾 LƯU HỒ SƠ & TÍNH ĐIỂM TIỀM NĂNG", use_container_width=True
-        )
+        btn_submit = st.form_submit_button("💾 LƯU HỒ SƠ & TÍNH ĐIỂM TIỀM NĂNG")
 
     if btn_submit:
         if not full_name.strip() or not phone_num.strip():
@@ -533,7 +533,7 @@ elif nav_choice == "📂 Quản lý danh sách KH":
     st.markdown("### 📂 Danh sách Khách hàng & Thao tác Chăm sóc")
 
     if df_data.empty:
-st.warning("Hiện tại chưa có dữ liệu trong hệ thống database.")
+        st.warning("Hiện tại chưa có dữ liệu trong hệ thống database.")
     else:
         f_col1, f_col2, f_col3 = st.columns(3)
         with f_col1:
@@ -604,7 +604,10 @@ st.warning("Hiện tại chưa có dữ liệu trong hệ thống database.")
             "Trạng Thái",
         ]
 
-        st.dataframe(view_df, use_container_width=True, hide_index=True)
+        try:
+            st.dataframe(view_df, use_container_width=True, hide_index=True)
+        except TypeError:
+            st.dataframe(view_df)
 
         st.divider()
         st.markdown("#### 🔄 Cập nhật tiến trình & Thao tác chi tiết")
@@ -620,7 +623,7 @@ st.warning("Hiện tại chưa có dữ liệu trong hệ thống database.")
 
             with col_detail1:
                 st.write(f"**Mã hồ sơ:** {curr_row['lead_code']}")
-st.write(
+                st.write(
                     f"**Thu nhập khai báo:** {format_currency_vnd(curr_row['monthly_income'])} / tháng"
                 )
                 st.write(
@@ -655,12 +658,12 @@ st.write(
                 )
                 new_stg = st.selectbox("Chuyển trạng thái tư vấn", stages_list, index=idx)
 
-                if st.button("💾 Cập nhật Trạng thái", use_container_width=True):
+                if st.button("💾 Cập nhật Trạng thái"):
                     update_lead_stage(int(curr_row["id"]), new_stg)
                     st.toast("Đã cập nhật giai đoạn tư vấn mới!")
                     st.rerun()
 
-                if st.button("🗑️ Xoá hồ sơ khỏi hệ thống", use_container_width=True):
+                if st.button("🗑️ Xoá hồ sơ khỏi hệ thống"):
                     remove_lead(int(curr_row["id"]))
                     st.toast("Đã xoá hồ sơ khách hàng.")
                     st.rerun()
@@ -688,7 +691,7 @@ elif nav_choice == "🔀 Tiến trình xử lý (Kanban)":
                     f"""
                     <div style="background:#e2e8f0; padding:8px; border-radius:6px; text-align:center; font-weight:700; color:#0d2c54; font-size:13px;">
                         {stg}<br><span style="font-size:18px; color:#1e50a2;">({len(sub_df)})</span>
-</div>
+                    </div>
                     """,
                     unsafe_allow_html=True,
                 )
@@ -735,7 +738,7 @@ elif nav_choice == "🧮 Công cụ tính nhanh Khoản vay":
                 ["Dư nợ giảm dần (Gốc đều)", "Dư nợ ban đầu (Cố định)"],
             )
 
-        if st.button("📊 TÍNH LỊCH TRẢ NỢ", use_container_width=True):
+        if st.button("📊 TÍNH LỊCH TRẢ NỢ"):
             principal_val = loan_amount * 1_000_000
             monthly_rate = (interest_rate_year / 100) / 12
 
@@ -753,7 +756,7 @@ elif nav_choice == "🧮 Công cụ tính nhanh Khoản vay":
                 )
             else:
                 monthly_interest = principal_val * monthly_rate
-monthly_principal = principal_val / loan_tenure_months
+                monthly_principal = principal_val / loan_tenure_months
                 fixed_pay = monthly_principal + monthly_interest
                 st.success(
                     f"👉 **Số tiền cố định trả hàng tháng:** ~ **{int(fixed_pay):,} VNĐ**"
@@ -773,7 +776,7 @@ monthly_principal = principal_val / loan_tenure_months
                 "Lãi suất tiết kiệm (%/năm)", value=5.2, step=0.1
             )
 
-        if st.button("💰 TÍNH LÃI DỰ KIẾN", use_container_width=True):
+        if st.button("💰 TÍNH LÃI DỰ KIẾN"):
             sav_val = sav_amount * 1_000_000
             total_sav_interest = sav_val * (sav_rate / 100) * (sav_months / 12)
             st.success(
@@ -827,5 +830,4 @@ if not df_data.empty:
         data=buffer.getvalue(),
         file_name="ACB_Smart_Leads_Report.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        use_container_width=True,
     )
