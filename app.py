@@ -10,7 +10,7 @@ import streamlit as st
 # =========================================================
 
 st.set_page_config(
-    page_title="ACB Lead Manager - Quản Lý Khách Hàng",
+    page_title="ACB Lead Manager - Nhóm 5",
     page_icon="🏦",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -347,7 +347,7 @@ with st.sidebar:
     )
 
     st.divider()
-    st.caption("ACB Lead Manager v3.0\nPhát triển cho Khối KHCN ACB")
+    st.caption("ACB Lead Manager - Nhóm 5 v3.0\nPhát triển cho Khối KHCN ACB")
 
 
 # =========================================================
@@ -357,7 +357,7 @@ with st.sidebar:
 st.markdown(
     """
     <div class="acb-header">
-        <h1>🏦 NGÂN HÀNG TMCP Á CHÂU (ACB)</h1>
+        <h1>🏦 ACB LEAD MANAGER - NHÓM 5</h1>
         <p>Hệ thống Quản lý & Phân loại Khách hàng Tiềm năng (Personal Banking Leads)</p>
     </div>
     """,
@@ -764,7 +764,7 @@ if not df_export.empty:
     st.sidebar.download_button(
         "📥 Xuất Báo Cáo Excel (ACB)",
         data=output.getvalue(),
-        file_name="ACB_Lead_Report.xlsx",
+        file_name="ACB_Lead_Report_Nhom5.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         use_container_width=True,
     )
