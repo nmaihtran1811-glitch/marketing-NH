@@ -18,7 +18,7 @@ st.set_page_config(
 
 
 # =========================================================
-# 2. GIAO DIỆN MỚI (ACB BRANDING: BLUE & TEAL THEME)
+# 2. GIAO DIỆN (ACB BRANDING: BLUE & TEAL THEME)
 # =========================================================
 
 st.markdown(
@@ -309,7 +309,6 @@ df = load_customers()
 # =========================================================
 
 with st.sidebar:
-    # HIỂN THỊ LOGO ACB TỪ TỆP acb_logo.jpg
     ACB_LOGO_PATH = "acb_logo.jpg"
 
     if os.path.exists(ACB_LOGO_PATH):
@@ -337,7 +336,7 @@ with st.sidebar:
     st.divider()
 
     menu = st.radio(
-        "MENU QUẢN LÝ",
+        "📂 MENU QUẢN LÝ",
         [
             "📌 Bảng điều khiển",
             "📋 Danh sách Leads",
@@ -382,7 +381,7 @@ if menu == "📌 Bảng điều khiển":
     c1, c2, c3, c4 = st.columns(4)
     with c1:
         st.markdown(
-            f'<div class="stat-box"><div class="stat-label">TỔNG KHÁCH HÀNG</div><div class="stat-number">{total}</div></div>',
+            f'<div class="stat-box"><div class="stat-label">👥 TỔNG KHÁCH HÀNG</div><div class="stat-number">{total}</div></div>',
             unsafe_allow_html=True,
         )
     with c2:
@@ -446,30 +445,30 @@ elif menu == "➕ Thêm Lead mới":
     )
 
     with st.form("add_acb_lead_form"):
-        st.markdown("##### 1. Thông tin cá nhân")
+        st.markdown("##### 👤 1. Thông tin cá nhân")
         c1, c2, c3 = st.columns(3)
         with c1:
-            name = st.text_input("Họ và Tên khách hàng *")
-            phone = st.text_input("Số điện thoại *")
+            name = st.text_input("👤 Họ và Tên khách hàng *")
+            phone = st.text_input("📱 Số điện thoại *")
         with c2:
-            gender = st.selectbox("Giới tính", ["Nam", "Nữ", "Khác"])
-            age = st.number_input("Độ tuổi", min_value=18, max_value=80, value=30)
+            gender = st.selectbox("🚻 Giới tính", ["Nam", "Nữ", "Khác"])
+            age = st.number_input("🎂 Độ tuổi", min_value=18, max_value=80, value=30)
         with c3:
-            email = st.text_input("Email liên hệ")
-            area = st.text_input("Khu vực / Đơn vị quản lý (VD: Quận 1, TP.HCM)")
+            email = st.text_input("📧 Email liên hệ")
+            area = st.text_input("📍 Khu vực / Địa chỉ (VD: Quận 1, TP.HCM)")
 
-        st.markdown("##### 2. Thông tin Tài chính & Nhu cầu Sản phẩm")
+        st.markdown("##### 💵 2. Thông tin Tài chính & Nhu cầu Sản phẩm")
         c4, c5, c6 = st.columns(3)
         with c4:
             occupation = st.text_input(
-                "Nghề nghiệp / Lĩnh vực", value="Kinh doanh tự do"
+                "💼 Nghề nghiệp / Lĩnh vực", value="Kinh doanh tự do"
             )
             income = st.number_input(
-                "Thu nhập hàng tháng (Triệu VNĐ)", min_value=0.0, value=25.0
+                "💰 Thu nhập hàng tháng (Triệu VNĐ)", min_value=0.0, value=25.0
             )
         with c5:
             product = st.selectbox(
-                "Sản phẩm ACB quan tâm",
+                "💳 Sản phẩm ACB quan tâm",
                 [
                     "Vay mua nhà đất",
                     "Vay sản xuất kinh doanh",
@@ -480,14 +479,14 @@ elif menu == "➕ Thêm Lead mới":
                 ],
             )
             amount = st.number_input(
-                "Nhu cầu vốn / Tiền gửi (Triệu VNĐ)",
+                "💵 Nhu cầu vốn / Tiền gửi (Triệu VNĐ)",
                 min_value=0.0,
                 value=800.0,
                 step=50.0,
             )
         with c6:
             need_time = st.selectbox(
-                "Thời gian dự kiến giải ngân",
+                "⏱️ Thời gian dự kiến giải ngân",
                 [
                     "Ngay lập tức (Dưới 15 ngày)",
                     "Trong 1 tháng",
@@ -495,9 +494,9 @@ elif menu == "➕ Thêm Lead mới":
                     "Trên 3 tháng",
                 ],
             )
-            employee = st.text_input("Chuyên viên RM tiếp nhận")
+            employee = st.text_input("👨‍💼 Chuyên viên RM tiếp nhận")
 
-        note = st.text_area("Ghi chú chi tiết thêm")
+        note = st.text_area("📝 Ghi chú chi tiết thêm")
 
         submitted = st.form_submit_button(
             "🚀 LƯU VÀ PHÂN LOẠI TỰ ĐỘNG", use_container_width=True
@@ -556,11 +555,11 @@ elif menu == "📋 Danh sách Leads":
         f1, f2 = st.columns(2)
         with f1:
             kw = st.text_input(
-                "🔍 Tìm nhanh", placeholder="Nhập Tên hoặc SĐT..."
+                "🔍 Tìm kiếm nhanh", placeholder="Nhập Tên hoặc Số điện thoại..."
             )
         with f2:
             cls_f = st.selectbox(
-                "Lọc theo Phân loại Lead", ["Tất cả", "HOT", "WARM", "COLD"]
+                "🏷️ Lọc theo Phân loại Lead", ["Tất cả", "HOT", "WARM", "COLD"]
             )
 
         filtered = df.copy()
@@ -611,7 +610,7 @@ elif menu == "📋 Danh sách Leads":
         # Thao tác cập nhật trạng thái
         st.markdown("##### 🛠️ Cập nhật tiến độ hồ sơ")
         selected_code = st.selectbox(
-            "Chọn Mã hồ sơ cần thao tác:", filtered["customer_code"].tolist()
+            "📌 Chọn Mã hồ sơ cần thao tác:", filtered["customer_code"].tolist()
         )
 
         if selected_code:
@@ -621,16 +620,16 @@ elif menu == "📋 Danh sách Leads":
 
             c_a, c_b = st.columns([2, 1])
             with c_a:
-                st.write(f"**Tên KH:** {row_data['name']} | **SĐT:** {row_data['phone']}")
+                st.write(f"👤 **Tên KH:** {row_data['name']} | 📱 **SĐT:** {row_data['phone']}")
                 st.write(
-                    f"**Thu nhập:** {format_currency_vnd(row_data['income'])}/tháng | **Địa chỉ:** {row_data['area']}"
+                    f"💰 **Thu nhập:** {format_currency_vnd(row_data['income'])}/tháng | 📍 **Địa chỉ:** {row_data['area']}"
                 )
-                st.write(f"**Ghi chú:** {row_data['note']}")
+                st.write(f"📝 **Ghi chú:** {row_data['note']}")
 
             with c_b:
                 current_st = row_data["status"]
                 new_st = st.selectbox(
-                    "Đổi trạng thái mới:",
+                    "🔄 Đổi trạng thái mới:",
                     [
                         "Mới tiếp nhận",
                         "Đã liên hệ",
@@ -706,9 +705,9 @@ elif menu == "🔄 Tiến độ xử lý":
                     st.markdown(
                         f"""
                         <div class="acb-card {border_cls}" style="padding:12px; margin-bottom:10px;">
-                            <b style="font-size:14px; color:#003B7A;">{r['name']}</b><br>
-                            <span style="font-size:12px; color:#64748b;">{r['product']}</span><br>
-                            <b style="font-size:12px; color:#0088CC;">{format_currency_vnd(r['expected_amount'])}</b>
+                            <b style="font-size:14px; color:#003B7A;">👤 {r['name']}</b><br>
+                            <span style="font-size:12px; color:#64748b;">💳 {r['product']}</span><br>
+                            <b style="font-size:12px; color:#0088CC;">💵 {format_currency_vnd(r['expected_amount'])}</b>
                         </div>
                         """,
                         unsafe_allow_html=True,
